@@ -5,6 +5,8 @@
 ![RAG](https://img.shields.io/badge/IA-RAG-8b5cf6)
 ![Streamlit](https://img.shields.io/badge/Streamlit-chat-ff4b4b)
 
+**[▶ Testar o assistente ao vivo](https://assistente-rag-documentos.streamlit.app/)**: sem instalar nada e sem chave de API.
+
 Assistente que responde perguntas sobre seus documentos (PDF, Markdown, TXT) **citando as fontes**, construído com *Retrieval-Augmented Generation*. O diferencial deste projeto é a **avaliação**: um conjunto de 43 perguntas com resposta conhecida mede objetivamente a qualidade da busca, e o CI falha se uma mudança piorar os resultados.
 
 Funciona de dois jeitos:
