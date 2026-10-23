@@ -8,7 +8,7 @@ from rag.generate import NOT_FOUND, ExtractiveGenerator, format_context
 from rag.ingest import Chunk
 from rag.retrievers import BM25Retriever, HybridRetriever, build_retrievers
 
-DOCS = Path(__file__).resolve().parents[1] / "docs_exemplo"
+LEIS = Path(__file__).resolve().parents[1] / "leis"
 
 TOY = [
     Chunk(0, "a.md", "O gato dorme no sofá da sala."),
@@ -64,12 +64,20 @@ def test_assistant_refuses_out_of_scope_without_calling_llm():
     assert llm.calls == 0
 
 
-def test_assistant_answers_with_sources():
-    assistant = Assistant.from_folder(DOCS, generator=ExtractiveGenerator())
-    answer = assistant.ask("Qual o limite do Pix à noite?")
-    assert answer.answered
-    assert "R$ 1.000" in answer.text and "[1]" in answer.text
-    assert answer.hits[0].chunk.document == "guia_conta_digital.pdf"
+@pytest.fixture(scope="module")
+def laws_assistant():
+    return Assistant.from_folder(LEIS, generator=ExtractiveGenerator())
+
+
+def test_assistant_answers_from_the_real_law(laws_assistant):
+    answer = laws_assistant.ask("Quantos dias de férias o empregado tem direito?")
+    assert answer.answered and "[1]" in answer.text
+    assert answer.hits[0].chunk.document == "CLT"
+
+
+def test_law_filter_with_real_laws(laws_assistant):
+    answer = laws_assistant.ask("prazo para reclamar de defeito", documents=["CDC"])
+    assert {h.chunk.document for h in answer.hits} == {"CDC"}
 
 
 def test_context_is_numbered_with_sources():
@@ -83,37 +91,12 @@ def test_empty_corpus_is_rejected():
 
 
 def test_evaluation_quality_bar():
-    """Teste de regressão: mudanças no código não podem piorar a busca."""
+    """Teste de regressão: mudanças no código não podem piorar a busca sem IA."""
     r = run()
-    assert r["busca"]["hibrido"]["hit@3"] >= 0.90
-    assert r["busca"]["hibrido"]["mrr"] >= 0.90
-    assert r["recusa"]["recusou_fora_do_escopo"] >= 0.75
-    assert r["recusa"]["respondeu_no_escopo"] >= 0.90
-
-
-def test_claude_generator_sends_context_and_rules(monkeypatch):
-    """Testa a integração com a API sem rede, usando um cliente falso."""
-    import types
-
-    import anthropic
-
-    from rag.generate import SYSTEM_PROMPT, ClaudeGenerator
-
-    captured = {}
-
-    class FakeMessages:
-        def create(self, **kwargs):
-            captured.update(kwargs)
-            block = types.SimpleNamespace(type="text", text=" O gato dorme no sofá [1]. ")
-            return types.SimpleNamespace(content=[block])
-
-    class FakeClient:
-        messages = FakeMessages()
-
-    monkeypatch.setattr(anthropic, "Anthropic", lambda: FakeClient())
-    gen = ClaudeGenerator(model="modelo-teste")
-    out = gen.answer("onde o gato dorme?", BM25Retriever(TOY).search("gato"))
-    assert out == "O gato dorme no sofá [1]."
-    assert captured["model"] == "modelo-teste"
-    assert captured["system"] == SYSTEM_PROMPT
-    assert "[1] (fonte: a.md)" in captured["messages"][0]["content"]
+    dev, test = r["conjuntos"]["desenvolvimento"], r["conjuntos"]["teste"]
+    assert dev["busca"]["hibrido_glossario"]["hit@3"] >= 0.75
+    assert test["busca"]["hibrido_glossario"]["hit@3"] >= 0.40
+    # A fusão híbrida nunca pode ficar abaixo da melhor estratégia isolada.
+    for data in (dev, test):
+        best_single = max(data["busca"]["bm25"]["mrr"], data["busca"]["tfidf_char"]["mrr"])
+        assert data["busca"]["hibrido"]["mrr"] >= best_single

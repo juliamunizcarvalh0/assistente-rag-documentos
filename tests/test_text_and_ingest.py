@@ -3,7 +3,7 @@ from pathlib import Path
 from rag.ingest import Section, chunk_sections, find_documents, load_documents, read_markdown
 from rag.text import split_sentences, tokenize
 
-DOCS = Path(__file__).resolve().parents[1] / "docs_exemplo"
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 
 def test_tokenize_normalizes_accents_stopwords_and_plurals():
@@ -40,11 +40,8 @@ def test_chunks_respect_size_and_overlap():
 
 
 def test_loads_pdf_with_page_numbers():
-    sections = load_documents(find_documents(DOCS))
-    pdf = [s for s in sections if s.document.endswith(".pdf")]
+    """PDFs continuam suportados: títulos detectados viram seções."""
+    pdf = load_documents(find_documents(FIXTURES))
     assert {s.page for s in pdf} == {1, 2}
-    # Títulos detectados no PDF viram seções, sem grudar no texto.
     assert "Limites do Pix" in {s.heading for s in pdf}
     assert not any("Limites do Pix" in s.text for s in pdf)
-    assert {s.document for s in sections} == {
-        "manual_colaborador.md", "politica_seguranca_informacao.md", "guia_conta_digital.pdf"}

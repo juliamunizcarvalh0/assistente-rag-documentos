@@ -1,6 +1,6 @@
 """Linha de comando.
 
-    python -m rag.cli "Qual o limite do Pix à noite?"
+    python -m rag.cli "Posso desistir de uma compra feita pela internet?"
     python -m rag.cli --docs minha_pasta --busca bm25      # modo interativo
 """
 
@@ -24,8 +24,9 @@ def show(answer) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Pergunte aos seus documentos")
     parser.add_argument("pergunta", nargs="?", help="sem pergunta, abre o modo interativo")
-    parser.add_argument("--docs", type=Path, default=ROOT / "docs_exemplo")
-    parser.add_argument("--busca", choices=["bm25", "tfidf_char", "hibrido"], default="hibrido")
+    parser.add_argument("--docs", type=Path, default=ROOT / "leis")
+    parser.add_argument("--busca", default="hibrido_glossario",
+                        choices=["bm25", "tfidf_char", "hibrido", "hibrido_glossario"])
     args = parser.parse_args()
 
     assistant = Assistant.from_folder(args.docs, retriever=args.busca)

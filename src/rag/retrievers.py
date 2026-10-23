@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 
+from .glossary import expand_query
 from .ingest import Chunk
 from .text import strip_accents, tokenize
 
@@ -100,7 +101,21 @@ class HybridRetriever:
         return [Hit(by_id[i], fused[i]) for i in best]
 
 
+class GlossaryRetriever:
+    """Expande a pergunta com o glossário (dia a dia → termos da lei) antes de buscar."""
+
+    name = "hibrido_glossario"
+
+    def __init__(self, base: Retriever):
+        self.base = base
+
+    def search(self, query: str, k: int = 5) -> list[Hit]:
+        return self.base.search(expand_query(query), k)
+
+
 def build_retrievers(chunks: list[Chunk]) -> dict[str, Retriever]:
     bm25 = BM25Retriever(chunks)
     tfidf = CharTfidfRetriever(chunks)
-    return {"bm25": bm25, "tfidf_char": tfidf, "hibrido": HybridRetriever([bm25, tfidf])}
+    hybrid = HybridRetriever([bm25, tfidf])
+    return {"bm25": bm25, "tfidf_char": tfidf, "hibrido": hybrid,
+            "hibrido_glossario": GlossaryRetriever(hybrid)}

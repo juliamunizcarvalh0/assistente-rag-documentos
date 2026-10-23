@@ -1,43 +1,36 @@
-{"pergunta": "Qual é o horário em que preciso estar disponível obrigatoriamente?", "documento": "manual_colaborador.md", "evidencia": "das 10h às 16h"}
-{"pergunta": "Em quanto tempo preciso usar o meu banco de horas?", "documento": "manual_colaborador.md", "evidencia": "utilizado em até seis meses"}
-{"pergunta": "Quantas vezes por semana o time de tecnologia vai ao escritório?", "documento": "manual_colaborador.md", "evidencia": "duas vezes por semana"}
-{"pergunta": "Quanto a empresa paga para ajudar com internet e luz de quem trabalha em casa?", "documento": "manual_colaborador.md", "evidencia": "R$ 150 por mês"}
-{"pergunta": "Posso passar dois meses trabalhando de Portugal?", "documento": "manual_colaborador.md", "evidencia": "mais de 30 dias exige aprovação"}
-{"pergunta": "Em quantas partes posso dividir minhas férias?", "documento": "manual_colaborador.md", "evidencia": "até três períodos"}
-{"pergunta": "Com quanta antecedência devo pedir férias?", "documento": "manual_colaborador.md", "evidencia": "antecedência mínima de 45 dias"}
-{"pergunta": "Ganho folga no meu aniversário?", "documento": "manual_colaborador.md", "evidencia": "day off"}
-{"pergunta": "Qual o valor do vale-refeição?", "documento": "manual_colaborador.md", "evidencia": "R$ 1.200 por mês"}
-{"pergunta": "A empresa ajuda a pagar a creche dos filhos?", "documento": "manual_colaborador.md", "evidencia": "Auxílio-creche de R$ 600"}
-{"pergunta": "Quantos dias de licença tem o pai quando nasce um filho?", "documento": "manual_colaborador.md", "evidencia": "40 dias para o outro responsável"}
-{"pergunta": "Qual o orçamento anual para cursos e certificações?", "documento": "manual_colaborador.md", "evidencia": "R$ 4.000"}
-{"pergunta": "A empresa paga curso de inglês?", "documento": "manual_colaborador.md", "evidencia": "70% da mensalidade"}
-{"pergunta": "Quando acontecem as avaliações de desempenho?", "documento": "manual_colaborador.md", "evidencia": "março e setembro"}
-{"pergunta": "Qual o prazo para enviar a nota fiscal de uma despesa?", "documento": "manual_colaborador.md", "evidencia": "em até 30 dias após a despesa"}
-{"pergunta": "Posso pedir um carro de categoria melhor no aplicativo de madrugada?", "documento": "manual_colaborador.md", "evidencia": "entre 22h e 6h"}
-{"pergunta": "Quanto posso gastar por dia com comida em viagem a trabalho?", "documento": "manual_colaborador.md", "evidencia": "R$ 120 por dia"}
-{"pergunta": "Como denunciar assédio de forma anônima?", "documento": "manual_colaborador.md", "evidencia": "Canal de Ética"}
-{"pergunta": "Posso aceitar um presente de um fornecedor?", "documento": "manual_colaborador.md", "evidencia": "valor inferior a R$ 200"}
-{"pergunta": "Em quantos dias devolvo o notebook quando saio da empresa?", "documento": "manual_colaborador.md", "evidencia": "até 5 dias úteis após o último dia"}
-{"pergunta": "Quantos caracteres a senha precisa ter?", "documento": "politica_seguranca_informacao.md", "evidencia": "mínimo 14 caracteres"}
-{"pergunta": "Posso usar código por SMS para acessar sistemas com dados restritos?", "documento": "politica_seguranca_informacao.md", "evidencia": "chave física de segurança"}
-{"pergunta": "Depois de quanto tempo a tela do notebook bloqueia sozinha?", "documento": "politica_seguranca_informacao.md", "evidencia": "5 minutos de inatividade"}
-{"pergunta": "Posso usar o wi-fi da cafeteria para trabalhar?", "documento": "politica_seguranca_informacao.md", "evidencia": "Wi-Fi públicas sem a VPN"}
-{"pergunta": "Posso usar pendrive no notebook da empresa?", "documento": "politica_seguranca_informacao.md", "evidencia": "Pendrives e outros dispositivos"}
-{"pergunta": "Por quanto tempo vale um acesso de administrador em produção?", "documento": "politica_seguranca_informacao.md", "evidencia": "no máximo 8 horas"}
-{"pergunta": "Posso usar dados reais de clientes no ambiente de testes?", "documento": "politica_seguranca_informacao.md", "evidencia": "anonimizados ou sintéticos"}
-{"pergunta": "Em quanto tempo devo avisar sobre um e-mail suspeito?", "documento": "politica_seguranca_informacao.md", "evidencia": "em até 1 hora"}
-{"pergunta": "Em quanto tempo a ANPD é comunicada de um vazamento de dados pessoais?", "documento": "politica_seguranca_informacao.md", "evidencia": "3 dias úteis"}
-{"pergunta": "O que acontece se eu cair em três simulações de phishing?", "documento": "politica_seguranca_informacao.md", "evidencia": "treinamento de reforço"}
-{"pergunta": "Em quanto tempo um cliente recebe resposta ao pedir a exclusão dos seus dados?", "documento": "politica_seguranca_informacao.md", "evidencia": "respondidos em até 15 dias"}
-{"pergunta": "Quanto tempo leva a análise para abrir uma conta?", "documento": "guia_conta_digital.pdf", "evidencia": "até 2 dias úteis"}
-{"pergunta": "Um adolescente de 15 anos pode ter conta?", "documento": "guia_conta_digital.pdf", "evidencia": "Aurora Jovem"}
-{"pergunta": "Quanto custa a sexta TED do mês?", "documento": "guia_conta_digital.pdf", "evidencia": "R$ 4,90"}
-{"pergunta": "Qual o limite do Pix à noite?", "documento": "guia_conta_digital.pdf", "evidencia": "R$ 1.000 no período noturno"}
-{"pergunta": "Quando o aumento do limite do Pix começa a valer?", "documento": "guia_conta_digital.pdf", "evidencia": "depois de 24 horas"}
-{"pergunta": "Quanto rende o dinheiro parado na conta?", "documento": "guia_conta_digital.pdf", "evidencia": "100% do CDI"}
-{"pergunta": "Até quanto o FGC garante o meu saldo?", "documento": "guia_conta_digital.pdf", "evidencia": "R$ 250 mil por CPF"}
-{"pergunta": "O cartão de crédito cobra anuidade?", "documento": "guia_conta_digital.pdf", "evidencia": "não tem anuidade"}
-{"pergunta": "Qual o IOF de compras no exterior?", "documento": "guia_conta_digital.pdf", "evidencia": "IOF de 3,38%"}
-{"pergunta": "Qual o prazo para contestar uma compra que eu não reconheço?", "documento": "guia_conta_digital.pdf", "evidencia": "até 90 dias após a data da compra"}
-{"pergunta": "Caí num golpe de Pix, o que faço?", "documento": "guia_conta_digital.pdf", "evidencia": "Mecanismo Especial de Devolução"}
-{"pergunta": "Quanto tempo leva para encerrar a conta?", "documento": "guia_conta_digital.pdf", "evidencia": "até 5 dias úteis após o pedido"}
+{"pergunta": "Posso desistir de uma compra que fiz pela internet?", "artigo": "CDC, art. 49", "evidencia": "desistir do contrato, no prazo de 7 dias"}
+{"pergunta": "Quanto tempo tenho para reclamar de um defeito num produto durável?", "artigo": "CDC, art. 26", "evidencia": "noventa dias, tratando-se de fornecimento de serviço e de produtos duráveis"}
+{"pergunta": "Em quanto tempo a loja precisa resolver o defeito do produto?", "artigo": "CDC, art. 18", "evidencia": "prazo máximo de trinta dias"}
+{"pergunta": "A loja pode me obrigar a comprar um produto junto com outro?", "artigo": "CDC, art. 39", "evidencia": "condicionar o fornecimento de produto ou de serviço ao fornecimento de outro produto"}
+{"pergunta": "Se eu pagar uma cobrança indevida, recebo o dobro de volta?", "artigo": "CDC, art. 42", "evidencia": "por valor igual ao dobro"}
+{"pergunta": "Propaganda enganosa é proibida?", "artigo": "CDC, art. 37", "evidencia": "proibida toda publicidade enganosa ou abusiva"}
+{"pergunta": "Quais são os meus direitos básicos como consumidor?", "artigo": "CDC, art. 6", "evidencia": "São direitos básicos do consumidor"}
+{"pergunta": "Por quanto tempo meu nome pode ficar sujo no cadastro de devedores?", "artigo": "CDC, art. 43", "evidencia": "período superior a cinco anos"}
+{"pergunta": "Uma cláusula abusiva no contrato tem validade?", "artigo": "CDC, art. 51", "evidencia": "São nulas de pleno direito"}
+{"pergunta": "O que a lei considera superendividamento?", "artigo": "CDC, art. 54-A", "evidencia": "Entende-se por superendividamento"}
+{"pergunta": "Qual o prazo para processar a empresa por dano causado por um produto?", "artigo": "CDC, art. 27", "evidencia": "Prescreve em cinco anos"}
+{"pergunta": "Quem é responsável por um defeito de fabricação?", "artigo": "CDC, art. 12", "evidencia": "O fabricante, o produtor, o construtor"}
+{"pergunta": "Posso pedir para uma empresa apagar os meus dados?", "artigo": "LGPD, art. 18", "evidencia": "eliminação dos dados pessoais tratados com o consentimento do titular"}
+{"pergunta": "Uma empresa pode usar meus dados sem eu autorizar?", "artigo": "LGPD, art. 7", "evidencia": "mediante o fornecimento de consentimento pelo titular"}
+{"pergunta": "O que é um dado pessoal sensível?", "artigo": "LGPD, art. 5", "evidencia": "dado pessoal sensível: dado pessoal sobre origem racial ou étnica"}
+{"pergunta": "Qual é a multa para quem descumpre a LGPD?", "artigo": "LGPD, art. 52", "evidencia": "limitada, no total, a R$ 50.000.000,00"}
+{"pergunta": "Posso cancelar a autorização que dei para usarem meus dados?", "artigo": "LGPD, art. 8", "evidencia": "O consentimento pode ser revogado a qualquer momento"}
+{"pergunta": "Existem regras especiais para dados de crianças?", "artigo": "LGPD, art. 14", "evidencia": "O tratamento de dados pessoais de crianças e de adolescentes"}
+{"pergunta": "A empresa tem que avisar se meus dados vazarem?", "artigo": "LGPD, art. 48", "evidencia": "comunicar à autoridade nacional e ao titular a ocorrência de incidente de segurança"}
+{"pergunta": "A empresa precisa ter um responsável pela proteção de dados?", "artigo": "LGPD, art. 41", "evidencia": "O controlador deverá indicar encarregado"}
+{"pergunta": "A LGPD vale para quem usa dados só para fins pessoais?", "artigo": "LGPD, art. 4", "evidencia": "fins exclusivamente particulares e não econômicos"}
+{"pergunta": "Posso levar meus dados para uma empresa concorrente?", "artigo": "LGPD, art. 18", "evidencia": "portabilidade dos dados a outro fornecedor de serviço ou produto"}
+{"pergunta": "Meus dados podem ser enviados para outro país?", "artigo": "LGPD, art. 33", "evidencia": "A transferência internacional de dados pessoais somente é permitida"}
+{"pergunta": "Os dados precisam ser apagados quando a empresa não usa mais?", "artigo": "LGPD, art. 16", "evidencia": "Os dados pessoais serão eliminados após o término de seu tratamento"}
+{"pergunta": "Quantos dias de férias eu tenho por ano?", "artigo": "CLT, art. 130", "evidencia": "30 (trinta) dias corridos"}
+{"pergunta": "Quanto tempo de intervalo eu tenho para almoçar?", "artigo": "CLT, art. 71", "evidencia": "no mínimo, de 1 (uma) hora"}
+{"pergunta": "Qual é a jornada máxima de trabalho por dia?", "artigo": "CLT, art. 58", "evidencia": "não excederá de 8 (oito) horas diárias"}
+{"pergunta": "Quanto a mais eu ganho por hora extra?", "artigo": "CLT, art. 59", "evidencia": "50% (cinquenta por cento) superior"}
+{"pergunta": "Quanto tempo dura a licença-maternidade?", "artigo": "CLT, art. 392", "evidencia": "120 (cento e vinte) dias"}
+{"pergunta": "Posso dividir minhas férias em partes?", "artigo": "CLT, art. 134", "evidencia": "em até três períodos"}
+{"pergunta": "Qual o prazo para a empresa pagar a rescisão?", "artigo": "CLT, art. 477", "evidencia": "até dez dias contados a partir do término do contrato"}
+{"pergunta": "Quem trabalha à noite recebe algum adicional?", "artigo": "CLT, art. 73", "evidencia": "acréscimo de 20 % (vinte por cento), pelo menos"}
+{"pergunta": "Quantos dias posso faltar quando eu casar?", "artigo": "CLT, art. 473", "evidencia": "até 3 (três) dias consecutivos, em virtude de casamento"}
+{"pergunta": "Quanto tempo de aviso prévio preciso dar?", "artigo": "CLT, art. 487", "evidencia": "trinta dias aos que perceberem por quinzena ou mês"}
+{"pergunta": "O que pode dar demissão por justa causa?", "artigo": "CLT, art. 482", "evidencia": "Constituem justa causa para rescisão do contrato de trabalho pelo empregador"}
+{"pergunta": "Quanto tempo de descanso preciso ter entre um dia de trabalho e outro?", "artigo": "CLT, art. 66", "evidencia": "período mínimo de 11 (onze) horas consecutivas"}
