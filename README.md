@@ -1,5 +1,6 @@
 # Assistente de Documentos com RAG (em português)
 
+[![CI](https://github.com/juliamunizcarvalh0/assistente-rag-documentos/actions/workflows/ci.yml/badge.svg)](https://github.com/juliamunizcarvalh0/assistente-rag-documentos/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![RAG](https://img.shields.io/badge/IA-RAG-8b5cf6)
 ![Streamlit](https://img.shields.io/badge/Streamlit-chat-ff4b4b)
@@ -58,7 +59,7 @@ Conjunto de 43 perguntas sobre três documentos de uma empresa fictícia, vária
 ## Como rodar
 
 ```bash
-git clone <url-deste-repositorio>
+git clone https://github.com/juliamunizcarvalh0/assistente-rag-documentos.git
 cd assistente-rag-documentos
 python -m venv .venv && source .venv/bin/activate
 make install
