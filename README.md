@@ -1,62 +1,73 @@
-# Assistente de Documentos com RAG (em português)
+# ⚖️ Pergunte à Lei: RAG sobre leis brasileiras
 
 [![CI](https://github.com/juliamunizcarvalh0/assistente-rag-documentos/actions/workflows/ci.yml/badge.svg)](https://github.com/juliamunizcarvalh0/assistente-rag-documentos/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![RAG](https://img.shields.io/badge/IA-RAG-8b5cf6)
+![Gemini](https://img.shields.io/badge/IA-Gemini-8E75B2)
 ![Streamlit](https://img.shields.io/badge/Streamlit-chat-ff4b4b)
 
-**[▶ Testar o assistente ao vivo](https://assistente-rag-documentos.streamlit.app/)**: sem instalar nada e sem chave de API.
+**[▶ Testar ao vivo](https://assistente-rag-documentos.streamlit.app/)**: sem instalar nada.
 
-Assistente que responde perguntas sobre seus documentos (PDF, Markdown, TXT) **citando as fontes**, construído com *Retrieval-Augmented Generation*. O diferencial deste projeto é a **avaliação**: um conjunto de 43 perguntas com resposta conhecida mede objetivamente a qualidade da busca, e o CI falha se uma mudança piorar os resultados.
+Assistente que responde dúvidas do dia a dia sobre o **Código de Defesa do Consumidor**, a **LGPD** e a **CLT**, em português simples e **citando o artigo exato** da lei. Construído com *Retrieval-Augmented Generation* (RAG) sobre os textos oficiais do Planalto, com 1.201 artigos indexados.
 
-Funciona de dois jeitos:
-- **Com LLM:** com uma chave da API da Anthropic, o Claude escreve a resposta a partir dos trechos encontrados, com citações `[1]`, `[2]`.
-- **Sem chave e sem custo:** um gerador extrativo devolve as frases mais relevantes dos documentos. Qualquer pessoa consegue clonar e rodar.
+> Exemplo do tipo de resposta: "Posso desistir de uma compra que fiz pela internet?"
+> **Sim. Você pode desistir em até 7 dias** a contar do recebimento do produto, segundo o art. 49 do CDC [1]...
 
 ## Como funciona
 
 ```mermaid
 flowchart LR
-    A[PDF / MD / TXT] --> B[Divisão em trechos<br/>por frases, com sobreposição]
-    B --> C1[BM25<br/>lexical]
-    B --> C2[TF-IDF de caracteres<br/>tolera variações]
-    Q[Pergunta] --> G{Está no escopo<br/>dos documentos?}
-    G -- não --> N[Não encontrei]
-    G -- sim --> C1 & C2
-    C1 & C2 --> F[Fusão RRF]
-    F --> L[LLM ou extrativo]
-    L --> R[Resposta + fontes]
+    P[Pergunta] --> R[Gemini reescreve em<br/>termos jurídicos]
+    R --> G[Glossário<br/>dia a dia → lei]
+    G --> B1[BM25<br/>implementado do zero]
+    G --> B2[TF-IDF de<br/>caracteres]
+    B1 & B2 --> F[Fusão RRF]
+    F --> A[Artigos mais relevantes]
+    A --> L[Gemini explica<br/>citando os artigos]
 ```
 
-1. **Ingestão:** lê os documentos, mantém o número da página e o título da seção (detectado também em PDFs), e divide o texto em trechos de ~90 palavras sem cortar frases ao meio.
-2. **Busca híbrida:** um BM25 implementado do zero (com stemming leve em português) e um TF-IDF de n-gramas de caracteres, combinados por *Reciprocal Rank Fusion*.
-3. **Recusa:** se a pergunta usa termos que não existem nos documentos, o assistente responde que não encontrou, antes de chamar o LLM. Isso reduz alucinações e custo.
-4. **Geração:** o prompt exige respostas apenas com base nos trechos e com citação de cada afirmação.
+1. **Leitura das leis:** um parser próprio lê o HTML oficial do Planalto e gera um trecho por artigo, com o capítulo e a seção como contexto.
+2. **Entender a pergunta:** o Gemini reescreve "apagar meus dados" como "eliminação de dados pessoais, direitos do titular", e um glossário próprio cobre os casos comuns sem custo.
+3. **Busca híbrida:** BM25 (lexical, com stemming leve em português) + TF-IDF de n-gramas de caracteres, combinados por *Reciprocal Rank Fusion*.
+4. **Resposta:** o Gemini responde **só com base nos artigos encontrados**, citando cada um. Se a informação não está lá, ele diz que não encontrou.
+5. **Sem cota, sem quebra:** se o limite gratuito do Gemini acabar, o app volta automaticamente para o modo extrativo e mostra os trechos da lei.
 
-## Resultados da avaliação
+## O desafio dos dados reais
 
-Conjunto de 43 perguntas sobre três documentos de uma empresa fictícia, várias escritas com palavras diferentes das do texto (ex.: "Posso usar o wi-fi da cafeteria?" para um trecho sobre "redes Wi-Fi públicas"). Relatório completo em [`reports/avaliacao.md`](reports/avaliacao.md).
+O texto "compilado" do Planalto mostra **todas as versões da lei ao mesmo tempo**. Indexá-lo direto faria o assistente responder com regras revogadas. O parser trata:
 
-| Estratégia de busca | Hit@1 | Hit@3 | MRR |
-|---|---|---|---|
-| BM25 | 95% | 100% | 0,973 |
-| TF-IDF de caracteres | 95% | 98% | 0,965 |
-| **Híbrida (RRF)** | **98%** | **98%** | **0,983** |
+- **Texto revogado:** aparece riscado, às vezes com `<strike>`, às vezes por CSS (`text-decoration: line-through`). Os dois são removidos.
+- **Notas de alteração** como "(Redação dada pela Lei nº 13.467, de 2017)", inclusive quando a própria página esquece de fechar o parêntese.
+- **Artigos vetados ou revogados**, que são descartados.
+- **A estrutura da CLT:** o decreto de 1943 tem 2 artigos próprios e é assinado, e só então vem a Consolidação, recomeçando do art. 1. Há ainda quadros anexos em tabelas.
+- **Numeração irregular:** "Art. 4º-A", "Art. 401A.", "Art. 401 - A.", "Art. 5 7." (número partido em duas tags HTML), sem confundir com "Art. 1º - Esta Consolidação…".
+- **Codificação Windows-1252**, usada pelas páginas do Planalto.
 
-| Comportamento | Resultado |
-|---|---|
-| Respondeu perguntas dentro do escopo | 98% |
-| Recusou perguntas fora do escopo | 88% (7 de 8) |
-| Resposta extrativa contém a informação esperada | 93% |
+Cada um desses casos tem teste automatizado em `tests/test_laws.py`.
 
-**O que aprendi com os experimentos**
+## Avaliação
 
-- Um **stemmer simples** fez mais diferença do que trocar de algoritmo: unificar "aceitar"/"aceitos" e "fornecedor"/"fornecedores" levou o BM25 de 91% para 93% de Hit@1 e a taxa de resposta de 88% para 98%.
-- **Estrutura do documento importa.** PDFs não marcam títulos; detectar as linhas de título e usá-las como seção (como no Markdown) levou a busca híbrida de 95% para 98% de Hit@1.
-- **Trechos muito curtos pioram a busca** (Hit@1 entre 88% e 93% com 40 a 60 palavras, contra 98% com 90), porque perdem o contexto. Trechos maiores ajudam pouco e deixam o prompt mais caro.
-- A pergunta que ainda escapa da recusa ("Quantos funcionários a empresa tem?") usa palavras genéricas que aparecem nos documentos. Um próximo passo é recusar também com base na pontuação da busca.
+São 60 perguntas escritas como uma pessoa comum perguntaria, cada uma com o artigo e o trecho exato que a responde, divididas em dois conjuntos:
 
-**Limitações honestas:** o corpus é pequeno (30 trechos), então as métricas ficam perto do teto, e o conjunto de avaliação foi usado durante o desenvolvimento. Para medir generalização, o ideal é um conjunto separado e documentos maiores.
+- **Desenvolvimento** (36 perguntas): usado para analisar os erros e melhorar a busca.
+- **Teste** (24 perguntas, outros assuntos): **não** é usado para ajustar nada e mede se as melhorias generalizam.
+
+Acerto do artigo certo entre os 3 primeiros resultados (Hit@3), **sem IA**:
+
+| Estratégia | Desenvolvimento | Teste |
+|---|---|---|
+| BM25 | 44% | 33% |
+| TF-IDF de caracteres | 39% | 29% |
+| Híbrida (RRF) | 50% | 38% |
+| Híbrida + glossário | 81% | **42%** |
+
+Relatório completo, com os erros pergunta por pergunta: [`reports/avaliacao.md`](reports/avaliacao.md).
+
+**O que os números mostram**
+
+- **O problema central é o vocabulário.** As pessoas dizem "apagar meus dados", "patrão" e "almoço"; a lei diz "eliminação", "empregador" e "repouso ou alimentação". A busca por palavras não encontra o artigo certo sem ajuda.
+- **Um glossário feito à mão não generaliza.** Ele levou o conjunto de desenvolvimento de 50% para 81%, mas o de teste só de 38% para 42%. O ganho grande vinha de ter sido ajustado às próprias perguntas. Numa primeira versão, algumas entradas foram inspiradas sem querer nas perguntas de teste e inflaram o resultado para 79%. Removi essas entradas e reportei o número limpo.
+- **Por isso o app usa um LLM para reescrever a pergunta**, porque é preciso entender o significado, e não só casar palavras. O efeito da reescrita é medido pelo workflow manual [`avaliacao-gemini.yml`](.github/workflows/avaliacao-gemini.yml), que roda a mesma avaliação usando o Gemini sem expor a chave.
+- **Sem IA, recusar perguntas fora do assunto é difícil:** só 2 de 6 foram recusadas. "Qual é a capital da Austrália?" tem uma pontuação de busca parecida com a de perguntas reais. Com o Gemini, quem recusa é o modelo, porque a resposta tem de vir dos artigos.
 
 ## Como rodar
 
@@ -66,46 +77,52 @@ cd assistente-rag-documentos
 python -m venv .venv && source .venv/bin/activate
 make install
 make app     # interface de chat em http://localhost:8501
-make eval    # roda a avaliação e atualiza reports/
+make eval    # avaliação da busca, atualiza reports/
 make test
 ```
+
+Sem chave, o app funciona no modo extrativo. Para respostas escritas pela IA, crie uma chave gratuita em [aistudio.google.com](https://aistudio.google.com) e defina `GEMINI_API_KEY` (veja `.env.example`). No Streamlit Cloud, coloque a chave em *Settings → Secrets*.
 
 Pela linha de comando:
 
 ```bash
-PYTHONPATH=src python -m rag.cli "Qual o limite do Pix à noite?"
+PYTHONPATH=src python -m rag.cli "Posso desistir de uma compra feita pela internet?"
 ```
-```
-O limite padrão do Pix é de R$ 5.000 por transação durante o dia (das 6h às 20h) e de R$ 1.000 no período noturno (das 20h às 6h). [1]
-
-  [1] guia_conta_digital.pdf (p. 1, Limites do Pix)
-  ...
-```
-
-Para usar o LLM, defina `ANTHROPIC_API_KEY` (veja `.env.example`) ou cole a chave na barra lateral do app. Para usar seus próprios documentos, envie-os pela interface ou rode `python -m rag.cli --docs sua_pasta`.
 
 ## Estrutura
 
 ```
+├── leis/               # HTML oficial do Planalto (CDC, LGPD, CLT)
 ├── src/rag/
+│   ├── laws.py         # parser das leis: artigos, revogações, notas, estrutura
+│   ├── ingest.py       # trechos (um por artigo) e suporte a PDF/Markdown
 │   ├── text.py         # normalização, stopwords e stemmer em português
-│   ├── ingest.py       # leitura de PDF/MD/TXT e divisão em trechos
-│   ├── retrievers.py   # BM25, TF-IDF de caracteres e busca híbrida (RRF)
-│   ├── generate.py     # prompt, gerador com Claude e gerador extrativo
-│   ├── assistant.py    # orquestração e recusa fora do escopo
-│   ├── evaluate.py     # métricas de busca, tamanho de trecho e recusa
+│   ├── glossary.py     # glossário dia a dia → termos da lei
+│   ├── retrievers.py   # BM25, TF-IDF de caracteres, fusão RRF
+│   ├── generate.py     # Gemini (resposta e reescrita) e modo extrativo
+│   ├── assistant.py    # orquestração, filtro por lei e plano B sem cota
+│   ├── evaluate.py     # métricas de busca nos dois conjuntos
 │   └── cli.py
 ├── app.py              # chat em Streamlit
-├── docs_exemplo/       # documentos fictícios usados no exemplo
-├── eval/               # perguntas com resposta conhecida e fora do escopo
+├── eval/               # perguntas de desenvolvimento, de teste e fora do escopo
 ├── reports/            # relatório de avaliação gerado
-└── tests/              # 16 testes, incluindo o piso de qualidade da busca
+└── tests/              # testes do parser, da busca, da IA (sem rede) e piso de qualidade
 ```
+
+## Limitações
+
+- O índice reflete as leis na data do download (outubro de 2026). Para atualizar, basta substituir os arquivos em `leis/`.
+- A busca ainda não usa embeddings semânticos, porque o plano gratuito do Streamlit não comporta um modelo local. Esse é o próximo passo natural para melhorar a busca sem depender da reescrita.
+- O plano gratuito do Gemini pode usar as perguntas para melhorar os produtos do Google. Por isso o app pede para não incluir dados pessoais.
+
+## Aviso
+
+Projeto educativo. As respostas não substituem a orientação de um advogado. Os textos legais são públicos (Lei 9.610/98, art. 8º, IV) e vêm do site oficial do Planalto.
 
 ## Tecnologias
 
-Python · scikit-learn · pypdf · API da Anthropic (Claude) · Streamlit · pytest · GitHub Actions
+Python · Gemini API · scikit-learn · BeautifulSoup · Streamlit · pytest · GitHub Actions
 
 ## Licença
 
-MIT. Os documentos em `docs_exemplo/` são fictícios e foram escritos para este projeto.
+MIT

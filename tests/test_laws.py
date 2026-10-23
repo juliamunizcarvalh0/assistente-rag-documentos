@@ -1,7 +1,9 @@
 """O leitor de leis é testado com uma página fictícia que imita o HTML do Planalto."""
 
+import pytest
+
 from rag.ingest import chunk_sections, load_documents
-from rag.laws import parse_law
+from rag.laws import _ARTICLE_RE, article_number, parse_law
 
 PAGE = """<html><head><meta charset="windows-1252"></head><body>
 <p align="center">LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990.</p>
@@ -79,3 +81,19 @@ def test_long_articles_are_split_but_keep_the_article_label(tmp_path):
     parts = [c for c in chunk_sections(load_documents([path])) if c.label == "CDC, art. 4-A"]
     assert len(parts) > 1
     assert parts[1].text.startswith("CDC, art. 4-A (continuação):")
+
+
+@pytest.mark.parametrize("line, number, rest", [
+    ("Art. 49. O consumidor pode", "49", "O consumidor pode"),
+    ("Art. 1º - Esta Consolidação", "1", "Esta Consolidação"),   # traço seguido de texto
+    ("Art. 4º-A O fornecedor", "4-A", "O fornecedor"),
+    ("Art. 401 - A. (VETADO)", "401-A", "(VETADO)"),           # sufixo com espaços
+    ("Art. 5 7. (VETADO).", "57", "(VETADO)."),                # número partido em duas tags
+    ("Art. 1o Esta Lei", "1", "Esta Lei"),                     # ordinal "o" de páginas antigas
+    ("Art. 10 - A falta", "10", "A falta"),                    # "A" é palavra, não sufixo
+    ("Art. 401A. (VETADO)", "401-A", "(VETADO)"),             # letra colada no número
+])
+def test_article_number_formats(line, number, rest):
+    match = _ARTICLE_RE.match(line)
+    assert article_number(match) == number
+    assert line[match.end():] == rest

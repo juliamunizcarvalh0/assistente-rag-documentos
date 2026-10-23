@@ -30,12 +30,31 @@ _LEVEL_RE = re.compile(r"^(LIVRO|T[ÍI]TULO|CAP[ÍI]TULO|SE[ÇC][ÃA]O|SUBSE[ÇC
                        re.IGNORECASE)
 # "Art. 49.", "Art. 1º", "Art. 1o" (páginas antigas), "Art. 4º-A", "Art. 1º - Texto".
 _ARTICLE_RE = re.compile(
-    r"^Art\.?\s*(\d+(?:\.\d+)?)\s*[º°o]?(?:-([A-Z]{1,2})\b)?\s*[º°o]?\s*\.?\s*-?\s*"
+    r"^Art\.?\s*(?P<num>\d+(?:\.\d+)?)"
+    r"(?:\s+(?P<num2>\d+)(?=\s*[º°.]))?"            # "Art. 5 7." (número partido em duas tags)
+    r"(?:\s*[º°]|o\b)?"                              # ordinal: "1º", "1 º", "1o" (páginas antigas)
+    r"(?:-(?P<suf>[A-Z]{1,2})\b"                      # "Art. 4º-A"
+    r"|(?P<suf_colado>[A-Z]{1,2})(?=\.)"              # "Art. 401A."
+    r"|\s+-\s+(?P<suf_espacado>[A-Z]{1,2})(?=\s*\.|\s*\(|\s*$))?"  # "401 - A." (não "1º - Esta")
+    r"\s*[º°o]?\s*\.?\s*-?\s*"
 )
+
+
+def article_number(match: re.Match) -> str:
+    """Número do artigo normalizado: "4-A", "57", "401-B"."""
+    suffix = match["suf"] or match["suf_colado"] or match["suf_espacado"]
+    return match["num"] + (match["num2"] or "") + (f"-{suffix}" if suffix else "")
 _NOTE_RE = re.compile(
-    r"\((?:\s*(?:Reda[çc][ãa]o dada|Inclu[íi]d[oa]|Acrescentad[oa]|Revogad[oa]|Vide|"
-    r"Vig[êe]ncia|Renumerad[oa]|Express[ãa]o|Promulga[çc][ãa]o|Produ[çc][ãa]o de efeito|"
+    r"\((?:\s*(?:Reda[çc][ãa]o (?:dada|restabelecida)|Inclu[íi]d[oa]|Acrescentad[oa]|"
+    r"Revogad[oa]|Vide|Vig[êe]ncia|Renumerad[oa]|Express[ãa]o|Promulga[çc][ãa]o|"
+    r"Produ[çc][ãa]o de efeito|"
     r"Regulamento|Texto|Mensagem)[^()]*(?:\([^()]*\)[^()]*)*)\)",
+    re.IGNORECASE,
+)
+# Nota sem o ")" final (erro da própria página): vai do "(" até o fim da linha.
+_OPEN_NOTE_RE = re.compile(
+    r"\(\s*(?:Reda[çc][ãa]o (?:dada|restabelecida)|Inclu[íi]d[oa]|Acrescentad[oa]|"
+    r"Revogad[oa]|Renumerad[oa])\s+p[eo]l[oa]s?\s[^()]*$",
     re.IGNORECASE,
 )
 _EMPTY_ARTICLE_RE = re.compile(r"^\W*(vetad[oa]|revogad[oa])\W*$", re.IGNORECASE)
@@ -52,8 +71,22 @@ def _read_html(path: Path) -> str:
 
 
 def _clean(text: str) -> str:
+    # Espaços primeiro: o Planalto usa &nbsp; entre as palavras das notas.
+    text = re.sub(r"\s+", " ", text)
     text = _NOTE_RE.sub("", text)
+    text = _OPEN_NOTE_RE.sub("", text)
+    text = re.sub(r"§\s*(\d+)\s*(?:o|º|°)(?=\s|$|-)", r"§ \1º", text)  # "§ 1 o" -> "§ 1º"
+    # Links soltos do Planalto no fim da linha, como "...; Vigência".
+    text = re.sub(r"(?<=[;.:])\s*(?:Vig[êe]ncia|Regulamento|Produ[çc][ãa]o de efeitos?)\s*$", "",
+                  text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _tidy_heading(name: str) -> str:
+    """'DAS FÉRIAS ANUAIS' -> 'Das férias anuais' (a CLT usa títulos em caixa alta)."""
+    if name.isupper():
+        name = name.capitalize()
+    return name
 
 
 def identify_law(text: str, filename: str) -> tuple[str, str]:
@@ -96,7 +129,9 @@ def parse_law(path: Path) -> list[Section]:
     def flush() -> None:
         body = " ".join(buffer[1:]).strip() if buffer else ""
         if article and buffer and not _EMPTY_ARTICLE_RE.match(body or buffer[0]):
-            heading = " › ".join(v for k, v in hierarchy.items() if v and k != "LIVRO") or None
+            heading = " › ".join(
+                _tidy_heading(v) for k, v in hierarchy.items() if v and k != "LIVRO"
+            ) or None
             sections.append(Section(
                 document=short, text="\n".join(buffer), heading=heading,
                 label=f"{short}, art. {article}", meta={"lei": full, "artigo": article},
@@ -123,7 +158,7 @@ def parse_law(path: Path) -> list[Section]:
         match = _ARTICLE_RE.match(line)
         if match:
             flush()
-            article = match.group(1) + (f"-{match.group(2)}" if match.group(2) else "")
+            article = article_number(match)
             if article == "1" and sections:
                 # Um novo "Art. 1" depois de artigos já lidos é o início do texto anexo.
                 # Na CLT, o decreto tem 2 artigos próprios, é assinado, e só então vem a

@@ -36,7 +36,7 @@ class Assistant:
     def __init__(
         self,
         chunks: list[Chunk],
-        retriever: str = "hibrido",
+        retriever: str = "hibrido_glossario",
         generator: Generator | None = None,
         k: int = 4,
         min_coverage: float = 0.5,

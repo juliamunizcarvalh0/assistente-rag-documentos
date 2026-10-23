@@ -1,69 +1,308 @@
 {
-  "n_perguntas": 43,
-  "n_trechos": 30,
-  "busca": {
-    "bm25": {
-      "hit@1": 0.9534883720930233,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
-      "mrr": 0.9728682170542634
+  "n_trechos": 1323,
+  "trechos_por_lei": {
+    "CDC": 133,
+    "CLT": 1091,
+    "LGPD": 99
+  },
+  "conjuntos": {
+    "desenvolvimento": {
+      "n": 36,
+      "busca": {
+        "bm25": {
+          "hit@1": 0.19444444444444445,
+          "hit@3": 0.4444444444444444,
+          "hit@5": 0.5,
+          "mrr": 0.3194444444444444
+        },
+        "tfidf_char": {
+          "hit@1": 0.16666666666666666,
+          "hit@3": 0.3888888888888889,
+          "hit@5": 0.5,
+          "mrr": 0.2842592592592592
+        },
+        "hibrido": {
+          "hit@1": 0.19444444444444445,
+          "hit@3": 0.5,
+          "hit@5": 0.5,
+          "mrr": 0.3287037037037037
+        },
+        "hibrido_glossario": {
+          "hit@1": 0.3055555555555556,
+          "hit@3": 0.8055555555555556,
+          "hit@5": 0.8333333333333334,
+          "mrr": 0.5287037037037037
+        }
+      },
+      "por_lei": {
+        "CDC": {
+          "n": 12,
+          "hit@1": 0.3333333333333333,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "mrr": 0.5972222222222222
+        },
+        "CLT": {
+          "n": 12,
+          "hit@1": 0.16666666666666666,
+          "hit@3": 0.8333333333333334,
+          "hit@5": 0.9166666666666666,
+          "mrr": 0.4611111111111111
+        },
+        "LGPD": {
+          "n": 12,
+          "hit@1": 0.4166666666666667,
+          "hit@3": 0.6666666666666666,
+          "hit@5": 0.6666666666666666,
+          "mrr": 0.5277777777777778
+        }
+      },
+      "falhas": [
+        {
+          "pergunta": "Em quanto tempo a loja precisa resolver o defeito do produto?",
+          "esperado": "CDC, art. 18",
+          "encontrado": [
+            "CDC, art. 23",
+            "CDC, art. 24",
+            "CDC, art. 26"
+          ]
+        },
+        {
+          "pergunta": "Uma empresa pode usar meus dados sem eu autorizar?",
+          "esperado": "LGPD, art. 7",
+          "encontrado": [
+            "LGPD, art. 8",
+            "LGPD, art. 9",
+            "LGPD, art. 7"
+          ]
+        },
+        {
+          "pergunta": "Qual é a multa para quem descumpre a LGPD?",
+          "esperado": "LGPD, art. 52",
+          "encontrado": [
+            "LGPD, art. 54",
+            "LGPD, art. 18",
+            "LGPD, art. 55-J"
+          ]
+        },
+        {
+          "pergunta": "A LGPD vale para quem usa dados só para fins pessoais?",
+          "esperado": "LGPD, art. 4",
+          "encontrado": [
+            "LGPD, art. 6",
+            "LGPD, art. 33",
+            "LGPD, art. 58-A"
+          ]
+        },
+        {
+          "pergunta": "Os dados precisam ser apagados quando a empresa não usa mais?",
+          "esperado": "LGPD, art. 16",
+          "encontrado": [
+            "CLT, art. 359",
+            "LGPD, art. 43",
+            "CLT, art. 485"
+          ]
+        },
+        {
+          "pergunta": "Quanto a mais eu ganho por hora extra?",
+          "esperado": "CLT, art. 59",
+          "encontrado": [
+            "CLT, art. 58-A",
+            "CLT, art. 58-A",
+            "CLT, art. 250"
+          ]
+        },
+        {
+          "pergunta": "O que pode dar demissão por justa causa?",
+          "esperado": "CLT, art. 482",
+          "encontrado": [
+            "CLT, art. 479",
+            "CLT, art. 502",
+            "CLT, art. 497"
+          ]
+        }
+      ]
     },
-    "tfidf_char": {
-      "hit@1": 0.9534883720930233,
-      "hit@3": 0.9767441860465116,
-      "hit@5": 0.9767441860465116,
-      "mrr": 0.9651162790697675
-    },
-    "hibrido": {
-      "hit@1": 0.9767441860465116,
-      "hit@3": 0.9767441860465116,
-      "hit@5": 1.0,
-      "mrr": 0.9825581395348837
+    "teste": {
+      "n": 24,
+      "busca": {
+        "bm25": {
+          "hit@1": 0.20833333333333334,
+          "hit@3": 0.3333333333333333,
+          "hit@5": 0.3333333333333333,
+          "mrr": 0.2708333333333333
+        },
+        "tfidf_char": {
+          "hit@1": 0.16666666666666666,
+          "hit@3": 0.2916666666666667,
+          "hit@5": 0.3333333333333333,
+          "mrr": 0.23958333333333334
+        },
+        "hibrido": {
+          "hit@1": 0.25,
+          "hit@3": 0.375,
+          "hit@5": 0.375,
+          "mrr": 0.3055555555555555
+        },
+        "hibrido_glossario": {
+          "hit@1": 0.25,
+          "hit@3": 0.4166666666666667,
+          "hit@5": 0.4166666666666667,
+          "mrr": 0.3125
+        }
+      },
+      "por_lei": {
+        "CDC": {
+          "n": 8,
+          "hit@1": 0.5,
+          "hit@3": 0.5,
+          "hit@5": 0.5,
+          "mrr": 0.5
+        },
+        "CLT": {
+          "n": 8,
+          "hit@1": 0.125,
+          "hit@3": 0.25,
+          "hit@5": 0.25,
+          "mrr": 0.1875
+        },
+        "LGPD": {
+          "n": 8,
+          "hit@1": 0.125,
+          "hit@3": 0.5,
+          "hit@5": 0.5,
+          "mrr": 0.25
+        }
+      },
+      "falhas": [
+        {
+          "pergunta": "Comprei um produto com defeito, posso pedir meu dinheiro de volta?",
+          "esperado": "CDC, art. 18",
+          "encontrado": [
+            "CDC, art. 23",
+            "CDC, art. 26",
+            "CDC, art. 17"
+          ]
+        },
+        {
+          "pergunta": "A loja é obrigada a cumprir o preço que anunciou?",
+          "esperado": "CDC, art. 30",
+          "encontrado": [
+            "CDC, art. 107",
+            "CDC, art. 51",
+            "CDC, art. 54-F"
+          ]
+        },
+        {
+          "pergunta": "Recebi um produto que não pedi, tenho que pagar?",
+          "esperado": "CDC, art. 39",
+          "encontrado": [
+            "CDC, art. 49",
+            "CDC, art. 13",
+            "CDC, art. 18"
+          ]
+        },
+        {
+          "pergunta": "O serviço foi mal feito, o que posso exigir?",
+          "esperado": "CDC, art. 20",
+          "encontrado": [
+            "CDC, art. 35",
+            "CLT, art. 162",
+            "CLT, art. 343"
+          ]
+        },
+        {
+          "pergunta": "Meus dados estão errados, posso pedir para corrigir?",
+          "esperado": "LGPD, art. 18",
+          "encontrado": [
+            "LGPD, art. 43",
+            "LGPD, art. 9",
+            "LGPD, art. 6"
+          ]
+        },
+        {
+          "pergunta": "O governo pode usar os meus dados?",
+          "esperado": "LGPD, art. 23",
+          "encontrado": [
+            "LGPD, art. 43",
+            "LGPD, art. 9",
+            "LGPD, art. 9"
+          ]
+        },
+        {
+          "pergunta": "Quem fiscaliza o cumprimento da LGPD?",
+          "esperado": "LGPD, art. 55-J",
+          "encontrado": [
+            "CLT, art. 626",
+            "CLT, art. 627-A",
+            "CLT, art. 627"
+          ]
+        },
+        {
+          "pergunta": "Se vazarem meus dados e eu tiver prejuízo, a empresa paga?",
+          "esperado": "LGPD, art. 42",
+          "encontrado": [
+            "LGPD, art. 44",
+            "LGPD, art. 48",
+            "LGPD, art. 21"
+          ]
+        },
+        {
+          "pergunta": "Até que dia o salário tem que cair na conta?",
+          "esperado": "CLT, art. 459",
+          "encontrado": [
+            "CLT, art. 83",
+            "CLT, art. 78",
+            "CLT, art. 465"
+          ]
+        },
+        {
+          "pergunta": "Posso vender uma parte das minhas férias?",
+          "esperado": "CLT, art. 143",
+          "encontrado": [
+            "CLT, art. 136",
+            "CLT, art. 129",
+            "CLT, art. 128"
+          ]
+        },
+        {
+          "pergunta": "O que a lei considera trabalho em home office?",
+          "esperado": "CLT, art. 75-B",
+          "encontrado": [
+            "CLT, art. 463",
+            "CLT, art. 492",
+            "CLT, art. 878-A"
+          ]
+        },
+        {
+          "pergunta": "Uma funcionária grávida pode ser demitida?",
+          "esperado": "CLT, art. 391-A",
+          "encontrado": [
+            "CLT, art. 497",
+            "CLT, art. 479",
+            "CLT, art. 494"
+          ]
+        },
+        {
+          "pergunta": "Quanto tempo de folga semanal eu tenho?",
+          "esperado": "CLT, art. 67",
+          "encontrado": [
+            "CLT, art. 229",
+            "CLT, art. 58-A",
+            "CLT, art. 58-A"
+          ]
+        },
+        {
+          "pergunta": "Posso ser obrigado a trabalhar em feriado?",
+          "esperado": "CLT, art. 70",
+          "encontrado": [
+            "CLT, art. 138",
+            "CLT, art. 136",
+            "CLT, art. 134"
+          ]
+        }
+      ]
     }
   },
-  "tamanho_trecho": {
-    "40": {
-      "n_trechos": 75,
-      "hit@1": 0.9302325581395349,
-      "hit@3": 0.9767441860465116,
-      "hit@5": 1.0,
-      "mrr": 0.9542635658914729
-    },
-    "60": {
-      "n_trechos": 45,
-      "hit@1": 0.8837209302325582,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
-      "mrr": 0.9379844961240309
-    },
-    "90": {
-      "n_trechos": 30,
-      "hit@1": 0.9767441860465116,
-      "hit@3": 0.9767441860465116,
-      "hit@5": 1.0,
-      "mrr": 0.9825581395348837
-    },
-    "150": {
-      "n_trechos": 28,
-      "hit@1": 0.9534883720930233,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
-      "mrr": 0.9728682170542634
-    },
-    "250": {
-      "n_trechos": 28,
-      "hit@1": 0.9534883720930233,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
-      "mrr": 0.9728682170542634
-    }
-  },
-  "recusa": {
-    "respondeu_no_escopo": 0.9767441860465116,
-    "recusou_fora_do_escopo": 0.875
-  },
-  "resposta_extrativa_contem_evidencia": 0.9302325581395349,
-  "falhas_busca_hibrida": [
-    "Em quantos dias devolvo o notebook quando saio da empresa?"
-  ]
+  "recusou_fora_do_escopo": 0.3333333333333333
 }

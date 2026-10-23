@@ -35,8 +35,11 @@ class Chunk:
 
     @property
     def indexed_text(self) -> str:
-        """O título da seção entra no texto indexado: ajuda muito a busca."""
-        return f"{self.heading}. {self.text}" if self.heading else self.text
+        """O nome da lei e o título da seção entram no texto indexado. Assim uma
+        pergunta sobre "dados" puxa para a LGPD, e uma sobre "férias" para o capítulo
+        certo da CLT, mesmo quando o artigo em si não repete essas palavras."""
+        parts = [self.meta.get("lei"), self.heading, self.text]
+        return ". ".join(p for p in parts if p)
 
     @property
     def source(self) -> str:
