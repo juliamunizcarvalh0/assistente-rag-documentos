@@ -1,0 +1,19 @@
+[project]
+name = "rag"
+version = "1.0.0"
+description = "Assistente RAG em português com busca híbrida, citações e avaliação"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
