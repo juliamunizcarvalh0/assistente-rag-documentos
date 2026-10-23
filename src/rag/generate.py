@@ -1,8 +1,7 @@
 """Geração da resposta a partir dos artigos recuperados.
 
-Três modos, escolhidos pela chave disponível:
+Dois modos, escolhidos pela chave disponível:
 - ``GeminiGenerator``: Gemini do Google (``GEMINI_API_KEY``), que tem plano gratuito.
-- ``ClaudeGenerator``: Claude da Anthropic (``ANTHROPIC_API_KEY``).
 - ``ExtractiveGenerator``: sem API e sem custo. Seleciona as frases mais relevantes
   dos artigos e garante que o projeto roda em qualquer máquina.
 
@@ -105,31 +104,6 @@ class GeminiGenerator:
         return self._generate(REWRITE_PROMPT.format(question=question), max_tokens=80)
 
 
-class ClaudeGenerator:
-    name = "claude"
-
-    def __init__(self, model: str | None = None, max_tokens: int = 600):
-        import anthropic
-
-        self.client = anthropic.Anthropic()
-        self.model = model or os.getenv("RAG_MODEL", "claude-haiku-5-5")
-        self.max_tokens = max_tokens
-
-    def _create(self, content: str, system: str | None = None, max_tokens: int | None = None):
-        kwargs = {"system": system} if system else {}
-        message = self.client.messages.create(
-            model=self.model, max_tokens=max_tokens or self.max_tokens,
-            messages=[{"role": "user", "content": content}], **kwargs,
-        )
-        return "".join(block.text for block in message.content if block.type == "text").strip()
-
-    def answer(self, question: str, hits: list[Hit]) -> str:
-        return self._create(_user_message(question, hits), SYSTEM_PROMPT)
-
-    def rewrite(self, question: str) -> str:
-        return self._create(REWRITE_PROMPT.format(question=question), max_tokens=80)
-
-
 class ExtractiveGenerator:
     """Escolhe as frases dos trechos que mais compartilham termos com a pergunta."""
 
@@ -162,6 +136,4 @@ class ExtractiveGenerator:
 def default_generator() -> Generator:
     if os.getenv("GEMINI_API_KEY"):
         return GeminiGenerator()
-    if os.getenv("ANTHROPIC_API_KEY"):
-        return ClaudeGenerator()
     return ExtractiveGenerator()

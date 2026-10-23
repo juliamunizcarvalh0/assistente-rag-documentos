@@ -13,7 +13,8 @@ PAGE = """<html><head><meta charset="windows-1252"></head><body>
 <p>Art. 1º Esta lei de teste estabelece regras gerais.</p>
 <p>Art. 2º <strike>O prazo é de dez dias.</strike></p>
 <p>O prazo é de quinze dias. (Redação dada pela Lei nº 99.999, de 2020)</p>
-<p>Parágrafo único. O prazo conta da entrega.</p>
+<p>Parágrafo único. O prazo conta da entrega.
+<span style="text-decoration: line-through">Prazo antigo de vinte dias.</span></p>
 <p>Art. 3º (VETADO).</p>
 <p align="center">CAPÍTULO II - Da Garantia</p>
 <p align="center">Seção I</p>
@@ -22,7 +23,7 @@ PAGE = """<html><head><meta charset="windows-1252"></head><body>
 <p>I - durante a garantia;</p>
 <p>II - após a garantia, nos casos previstos.</p>
 <p>Brasília, 11 de setembro de 1990; 169º da Independência.</p>
-<p>Art. 99. Esta linha é da assinatura e não deve entrar.</p>
+<p>QUADRO ANEXO</p><p>Tabela que não deve entrar.</p>
 </body></html>"""
 
 
@@ -42,6 +43,7 @@ def test_parses_articles_and_identifies_the_law(tmp_path):
 def test_removes_revoked_text_and_amendment_notes(tmp_path):
     art2 = parse_law(_write(tmp_path))[1].text
     assert "dez dias" not in art2          # riscado = revogado
+    assert "vinte dias" not in art2        # riscado via CSS
     assert "quinze dias" in art2
     assert "Redação dada" not in art2
     assert "Parágrafo único" in art2

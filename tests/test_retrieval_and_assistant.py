@@ -90,30 +90,3 @@ def test_evaluation_quality_bar():
     assert r["recusa"]["recusou_fora_do_escopo"] >= 0.75
     assert r["recusa"]["respondeu_no_escopo"] >= 0.90
 
-
-def test_claude_generator_sends_context_and_rules(monkeypatch):
-    """Testa a integração com a API sem rede, usando um cliente falso."""
-    import types
-
-    import anthropic
-
-    from rag.generate import SYSTEM_PROMPT, ClaudeGenerator
-
-    captured = {}
-
-    class FakeMessages:
-        def create(self, **kwargs):
-            captured.update(kwargs)
-            block = types.SimpleNamespace(type="text", text=" O gato dorme no sofá [1]. ")
-            return types.SimpleNamespace(content=[block])
-
-    class FakeClient:
-        messages = FakeMessages()
-
-    monkeypatch.setattr(anthropic, "Anthropic", lambda: FakeClient())
-    gen = ClaudeGenerator(model="modelo-teste")
-    out = gen.answer("onde o gato dorme?", BM25Retriever(TOY).search("gato"))
-    assert out == "O gato dorme no sofá [1]."
-    assert captured["model"] == "modelo-teste"
-    assert captured["system"] == SYSTEM_PROMPT
-    assert "[1] (fonte: a.md)" in captured["messages"][0]["content"]

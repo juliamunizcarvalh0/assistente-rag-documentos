@@ -56,17 +56,22 @@ def _clean(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def identify_law(text: str, fallback: str) -> tuple[str, str]:
-    head = text[:3000]
+def identify_law(text: str, filename: str) -> tuple[str, str]:
+    """Procura o número da lei no início da página ou no nome do arquivo."""
+    head, name = text[:3000], filename.replace(".", "")
     for number, names in KNOWN_LAWS.items():
-        if number in head:
+        if number in head or number.replace(".", "") in name:
             return names
-    return fallback, fallback
+    return filename, filename
 
 
 def html_lines(html: str) -> list[str]:
     soup = BeautifulSoup(html, "lxml")
-    for tag in soup(["strike", "s", "del", "script", "style"]):
+    # Riscado = revogado. Tabelas são cabeçalhos e quadros anexos, nunca artigos.
+    for tag in soup(["strike", "s", "del", "script", "style", "table"]):
+        tag.decompose()
+    # Algumas páginas riscam o texto revogado por CSS em vez da tag <strike>.
+    for tag in soup.find_all(style=re.compile(r"line-through", re.IGNORECASE)):
         tag.decompose()
     blocks = soup.find_all("p") or [soup.body or soup]
     lines = []
@@ -119,13 +124,22 @@ def parse_law(path: Path) -> list[Section]:
         if match:
             flush()
             article = match.group(1) + (f"-{match.group(2)}" if match.group(2) else "")
+            if article == "1" and sections:
+                # Um novo "Art. 1" depois de artigos já lidos é o início do texto anexo.
+                # Na CLT, o decreto tem 2 artigos próprios, é assinado, e só então vem a
+                # Consolidação em si, recomeçando do art. 1. Fica só o texto anexo.
+                sections.clear()
             rest = line[match.end():].strip()
             buffer = [f"Art. {article}."] + ([rest] if rest else [])
             continue
         if article is None:
-            continue  # preâmbulo da lei
-        if re.match(r"^Bras[íi]lia,", line):
-            break  # assinaturas no final
+            continue  # preâmbulo, assinaturas ou anexos fora de um artigo
+        if re.match(r"^(Bras[íi]lia|Rio de Janeiro),", line) or \
+                re.match(r"^(QUADRO|ANEXO)\b", line):
+            # Assinatura ou tabela anexa: encerra o artigo atual sem incluir a linha.
+            flush()
+            article, buffer = None, []
+            continue
         buffer.append(line)
     flush()
     return sections

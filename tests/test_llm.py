@@ -8,7 +8,6 @@ from rag.assistant import Assistant
 from rag.generate import (
     NOT_FOUND,
     SYSTEM_PROMPT,
-    ClaudeGenerator,
     GeminiGenerator,
     QuotaExceededError,
 )
@@ -115,19 +114,3 @@ def test_llm_saying_not_found_is_not_an_answer():
         "prazo para desistir do contrato")
     assert not answer.answered and answer.hits == []
 
-
-def test_claude_generator_still_supported(monkeypatch):
-    import anthropic
-
-    captured = {}
-
-    class FakeMessages:
-        def create(self, **kwargs):
-            captured.update(kwargs)
-            block = types.SimpleNamespace(type="text", text="ok [1]")
-            return types.SimpleNamespace(content=[block])
-
-    monkeypatch.setattr(anthropic, "Anthropic",
-                        lambda: types.SimpleNamespace(messages=FakeMessages()))
-    out = ClaudeGenerator(model="modelo-teste").answer("x", BM25Retriever(CHUNKS).search("férias"))
-    assert out == "ok [1]" and captured["system"] == SYSTEM_PROMPT
