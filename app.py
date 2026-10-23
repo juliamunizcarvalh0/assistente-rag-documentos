@@ -137,7 +137,8 @@ if question:
                     if answer.mode == "gemini" else
                     "Modo sem IA: trechos copiados dos artigos mais relevantes.")
             if "cota" in answer.notes:
-                mode = "O limite diário gratuito da IA acabou. Mostrando os trechos da lei."
+                mode = ("O limite gratuito da IA foi atingido. Mostrando os trechos da lei; "
+                        "tente de novo em um minuto.")
             st.session_state.history.append({
                 "role": "assistant", "text": answer.text, "mode": mode,
                 "sources": [{"label": h.chunk.source, "heading": h.chunk.heading,

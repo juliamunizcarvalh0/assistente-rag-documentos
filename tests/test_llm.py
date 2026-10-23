@@ -114,3 +114,26 @@ def test_llm_saying_not_found_is_not_an_answer():
         "prazo para desistir do contrato")
     assert not answer.answered and answer.hits == []
 
+
+
+def test_evaluation_rewriter_waits_and_retries_on_quota():
+    """A avaliação com Gemini não pode falhar em silêncio quando o limite estoura."""
+    from rag.evaluate import RewriteRetriever
+
+    calls = {"n": 0}
+
+    def behaviour(model, contents, config):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise _client_error(429)  # limite por minuto na primeira tentativa
+        return "direito de arrependimento"
+
+    slept = []
+    assistant = Assistant(CHUNKS, generator=FakeGemini(behaviour))
+    rewriter = RewriteRetriever(assistant, min_interval=0, sleep=slept.append)
+    hits = rewriter.search("Posso devolver uma compra da internet?")
+    assert hits[0].chunk.label == "CDC, art. 49"
+    assert rewriter.ok == 1 and rewriter.failed == 0
+    assert slept  # esperou antes de tentar de novo
+    rewriter.search("Posso devolver uma compra da internet?")
+    assert calls["n"] == 2  # pergunta repetida usa o cache, sem gastar cota

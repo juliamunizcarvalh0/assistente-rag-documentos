@@ -19,10 +19,12 @@ from __future__ import annotations
 
 import json
 import re
+import sys
+import time
 from pathlib import Path
 
 from .assistant import Assistant
-from .generate import ExtractiveGenerator
+from .generate import ExtractiveGenerator, QuotaExceededError
 from .ingest import chunk_sections, find_documents, load_documents
 from .retrievers import build_retrievers
 from .text import strip_accents
@@ -81,16 +83,50 @@ BEST = "hibrido_glossario"
 
 
 class RewriteRetriever:
-    """Busca como o app faz com IA: pergunta original + reescrita do Gemini, fundidas."""
+    """Busca como o app faz com IA: pergunta original + reescrita do Gemini, fundidas.
+
+    O plano gratuito do Gemini limita as chamadas por minuto. Por isso as chamadas
+    são espaçadas e, se o limite estourar, a avaliação espera e tenta de novo. As
+    reescritas que funcionaram são contadas e aparecem no relatório: sem isso, uma
+    falha silenciosa faria a busca com IA parecer igual à busca sem IA.
+    """
 
     name = "gemini_reescrita"
 
-    def __init__(self, assistant: Assistant):
+    def __init__(self, assistant: Assistant, min_interval: float = 4.5,
+                 retries: int = 4, wait: float = 30.0, sleep=time.sleep):
         self.assistant = assistant
+        self.generator = assistant.generator
+        self.min_interval, self.retries, self.wait, self.sleep = min_interval, retries, wait, sleep
+        self.cache: dict[str, str | None] = {}
+        self.last_call = 0.0
+        self.ok = self.failed = 0
+
+    def rewrite(self, question: str) -> str | None:
+        if question in self.cache:
+            return self.cache[question]
+        result = None
+        for attempt in range(self.retries + 1):
+            pause = self.min_interval - (time.monotonic() - self.last_call)
+            if pause > 0:
+                self.sleep(pause)
+            self.last_call = time.monotonic()
+            try:
+                result = self.generator.rewrite(question) or None
+                break
+            except QuotaExceededError:
+                if attempt < self.retries:
+                    self.sleep(self.wait * (attempt + 1))
+            except Exception as exc:  # noqa: BLE001 - registra e segue para a próxima pergunta
+                print(f"Falha ao reescrever {question!r}: {exc}", file=sys.stderr)
+                break
+        self.ok += result is not None
+        self.failed += result is None
+        self.cache[question] = result
+        return result
 
     def search(self, query: str, k: int = 5):
-        rewritten = self.assistant._rewrite(query, [])
-        return self.assistant._fused_search(query, rewritten, None)[:k]
+        return self.assistant._fused_search(query, self.rewrite(query), None)[:k]
 
 
 def run(laws: Path = ROOT / "leis", eval_dir: Path = ROOT / "eval",
@@ -112,7 +148,8 @@ def run(laws: Path = ROOT / "leis", eval_dir: Path = ROOT / "eval",
         from .generate import GeminiGenerator
 
         llm_assistant = Assistant(chunks, generator=GeminiGenerator(), k=5)
-        retrievers["gemini_reescrita"] = RewriteRetriever(llm_assistant)
+        rewriter = RewriteRetriever(llm_assistant)
+        retrievers["gemini_reescrita"] = rewriter
     assistant = Assistant(chunks, generator=ExtractiveGenerator())
     refusals = [assistant.ask(q["pergunta"]) for q in out_of_scope]
     return {
@@ -121,7 +158,21 @@ def run(laws: Path = ROOT / "leis", eval_dir: Path = ROOT / "eval",
                             for d in sorted({c.document for c in chunks})},
         "conjuntos": {name: evaluate_set(retrievers, qs) for name, qs in sets.items()},
         "recusou_fora_do_escopo": sum(not a.answered for a in refusals) / len(refusals),
+        "reescritas_gemini": ({"ok": rewriter.ok, "total": rewriter.ok + rewriter.failed}
+                              if with_gemini else None),
     }
+
+
+def _gemini_line(r: dict) -> str:
+    g = r.get("reescritas_gemini")
+    if not g:
+        return ("Resultados **sem IA**. No app, o Gemini ainda reescreve a pergunta antes da "
+                "busca (veja `--gemini`).")
+    warning = "" if g["ok"] == g["total"] else (
+        " ⚠️ Algumas reescritas falharam: nelas a linha `gemini_reescrita` usou só a busca "
+        "sem IA, e o resultado subestima o efeito do Gemini.")
+    return (f"A linha `gemini_reescrita` usa o Gemini para reescrever a pergunta: "
+            f"**{g['ok']} de {g['total']}** reescritas funcionaram.{warning}")
 
 
 def to_markdown(r: dict) -> str:
@@ -139,7 +190,7 @@ def to_markdown(r: dict) -> str:
         f"- **Teste** ({test['n']} perguntas, outros assuntos): escrito à parte e **não** usado "
         "para ajustar nada. Mostra se as melhorias generalizam.",
         "",
-        "Resultados **sem IA**. No app, o Gemini ainda reescreve a pergunta antes da busca.",
+        _gemini_line(r),
         "",
         "## Hit@3 e MRR por estratégia",
         "",
