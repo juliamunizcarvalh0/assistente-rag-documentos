@@ -51,22 +51,24 @@ São 60 perguntas escritas como uma pessoa comum perguntaria, cada uma com o art
 - **Desenvolvimento** (36 perguntas): usado para analisar os erros e melhorar a busca.
 - **Teste** (24 perguntas, outros assuntos): **não** é usado para ajustar nada e mede se as melhorias generalizam.
 
-Acerto do artigo certo entre os 3 primeiros resultados (Hit@3), **sem IA**:
+Acerto do artigo certo entre os 3 primeiros resultados (Hit@3) e MRR:
 
-| Estratégia | Desenvolvimento | Teste |
-|---|---|---|
-| BM25 | 44% | 33% |
-| TF-IDF de caracteres | 39% | 29% |
-| Híbrida (RRF) | 50% | 38% |
-| Híbrida + glossário | 81% | **42%** |
+| Estratégia | Hit@3 desenv. | Hit@3 teste | MRR teste |
+|---|---|---|---|
+| BM25 | 44% | 33% | 0,271 |
+| TF-IDF de caracteres | 39% | 29% | 0,240 |
+| Híbrida (RRF) | 50% | 38% | 0,306 |
+| Híbrida + glossário | 81% | 42% | 0,312 |
+| **Gemini reescreve a pergunta + híbrida** | 81% | **67%** | **0,526** |
 
-Relatório completo, com os erros pergunta por pergunta: [`reports/avaliacao.md`](reports/avaliacao.md).
+A linha do Gemini vem do workflow manual [`avaliacao-gemini.yml`](.github/workflows/avaliacao-gemini.yml), em que 60 de 60 reescritas funcionaram. As demais linhas vêm de [`reports/avaliacao.md`](reports/avaliacao.md), que traz os erros pergunta por pergunta.
 
 **O que os números mostram**
 
 - **O problema central é o vocabulário.** As pessoas dizem "apagar meus dados", "patrão" e "almoço"; a lei diz "eliminação", "empregador" e "repouso ou alimentação". A busca por palavras não encontra o artigo certo sem ajuda.
 - **Um glossário feito à mão não generaliza.** Ele levou o conjunto de desenvolvimento de 50% para 81%, mas o de teste só de 38% para 42%. O ganho grande vinha de ter sido ajustado às próprias perguntas. Numa primeira versão, algumas entradas foram inspiradas sem querer nas perguntas de teste e inflaram o resultado para 79%. Removi essas entradas e reportei o número limpo.
-- **Por isso o app usa um LLM para reescrever a pergunta**, porque é preciso entender o significado, e não só casar palavras. O efeito da reescrita é medido pelo workflow manual [`avaliacao-gemini.yml`](.github/workflows/avaliacao-gemini.yml), que roda a mesma avaliação usando o Gemini sem expor a chave.
+- **Um LLM entendendo o significado resolve o que o glossário não resolve:** nas perguntas novas, a reescrita pelo Gemini levou o acerto de 42% para **67%**, e o MRR quase dobrou (0,312 → 0,526). Isso justifica a chamada extra ao LLM antes da busca.
+- **Medir também exige cuidado:** na primeira rodada, o limite por minuto do plano gratuito fez a maior parte das reescritas falhar em silêncio, e o resultado com Gemini saiu igual ao sem IA. Agora a avaliação espaça as chamadas, tenta de novo quando bate o limite e informa quantas reescritas funcionaram.
 - **Sem IA, recusar perguntas fora do assunto é difícil:** só 2 de 6 foram recusadas. "Qual é a capital da Austrália?" tem uma pontuação de busca parecida com a de perguntas reais. Com o Gemini, quem recusa é o modelo, porque a resposta tem de vir dos artigos.
 
 ## Como rodar
