@@ -106,10 +106,18 @@ PYTHONPATH=src python -m rag.cli "Posso desistir de uma compra feita pela intern
 │   ├── evaluate.py     # métricas de busca nos dois conjuntos
 │   └── cli.py
 ├── app.py              # chat em Streamlit
+├── space/              # README e Dockerfile do Hugging Face Space
+├── scripts/            # publicação no Hugging Face
 ├── eval/               # perguntas de desenvolvimento, de teste e fora do escopo
 ├── reports/            # relatório de avaliação gerado
 └── tests/              # testes do parser, da busca, da IA (sem rede) e piso de qualidade
 ```
+
+## Hugging Face Space
+
+O app também é publicado como um [Hugging Face Space](https://huggingface.co/spaces) com SDK Docker. O workflow [`deploy-hf-space.yml`](.github/workflows/deploy-hf-space.yml) roda a cada push na `main`: o script [`scripts/deploy_hf_space.py`](scripts/deploy_hf_space.py) monta uma pasta só com o que o app precisa (`app.py`, `src/`, `leis/` e os arquivos de [`space/`](space/)), cria o Space na primeira vez, configura a chave do Gemini como segredo e envia os arquivos.
+
+Para ativar num fork: crie um token de escrita em [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) e salve-o como o segredo `HF_TOKEN` do repositório no GitHub.
 
 ## Limitações
 

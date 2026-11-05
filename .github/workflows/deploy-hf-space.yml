@@ -1,0 +1,29 @@
+name: Publicar no Hugging Face
+
+# Publica o app como Hugging Face Space a cada push na main (se o segredo
+# HF_TOKEN existir) ou manualmente pela aba Actions → "Run workflow".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sem HF_TOKEN, nada a publicar
+        if: env.HF_TOKEN == ''
+        run: echo "::notice::Crie o segredo HF_TOKEN no repositório para publicar o Space."
+      - uses: actions/setup-python@v5
+        if: env.HF_TOKEN != ''
+        with:
+          python-version: "3.12"
+      - name: Publicar o Space
+        if: env.HF_TOKEN != ''
+        run: |
+          pip install "huggingface_hub>=0.30"
+          python scripts/deploy_hf_space.py | tee -a "$GITHUB_STEP_SUMMARY"
